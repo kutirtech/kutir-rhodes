@@ -25,6 +25,7 @@ win32 {
   DESTDIR = ../../../win32/bin/syncengine
   OBJECTS_DIR = ../../../win32/bin/syncengine/tmp
   DEFINES += WIN32 _WINDOWS _LIB _UNICODE UNICODE
+  DEFINES += BUFSIZ=512 STATIC_LINKED RUBY_EXPORT WIN32_LEAN_AND_MEAN
   Debug {
     DEFINES += _DEBUG DEBUG
   }
