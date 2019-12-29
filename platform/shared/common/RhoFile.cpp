@@ -24,6 +24,8 @@
 * http://rhomobile.com
 *------------------------------------------------------------------------*/
 
+#include <android/log.h>
+
 #include "RhoFile.h"
 #include "common/StringConverter.h"
 #include "common/Tokenizer.h"
@@ -230,9 +232,12 @@ bool CRhoFile::isOpened() const{
 }
 
 bool CRhoFile::open( const char* szFilePath, EOpenModes eMode ){
+    __android_log_print(ANDROID_LOG_INFO, "UGU", "CRhoFile::open 1 [%s]", szFilePath);
     m_strPath = szFilePath;
     if ( eMode == OpenForAppend || eMode == OpenForReadWrite ){
+        __android_log_print(ANDROID_LOG_INFO, "UGU", "CRhoFile::open 2");
         m_file = fopen(szFilePath,"r+bc");
+        __android_log_print(ANDROID_LOG_INFO, "UGU", "CRhoFile::open 3");
 
         if ( !m_file && !isFileExist(szFilePath) )
             m_file = fopen(szFilePath,"wbc");
@@ -240,10 +245,16 @@ bool CRhoFile::open( const char* szFilePath, EOpenModes eMode ){
         if ( eMode == OpenForAppend )
             movePosToEnd();
 
-    }else if ( eMode == OpenReadOnly )
+    }else if ( eMode == OpenReadOnly ) {
+        __android_log_print(ANDROID_LOG_INFO, "UGU", "CRhoFile::open 4");
         m_file = fopen(szFilePath,"rbc");
-    else if ( eMode == OpenForWrite )
+        __android_log_print(ANDROID_LOG_INFO, "UGU", "CRhoFile::open 5");
+    } else if ( eMode == OpenForWrite ) {
+        __android_log_print(ANDROID_LOG_INFO, "UGU", "CRhoFile::open 6");
         m_file = fopen(szFilePath,"wbc");
+        __android_log_print(ANDROID_LOG_INFO, "UGU", "CRhoFile::open 7");
+    }
+    __android_log_print(ANDROID_LOG_INFO, "UGU", "CRhoFile::open 8");
     
     return isOpened();
 }

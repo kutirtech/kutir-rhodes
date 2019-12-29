@@ -24,6 +24,8 @@
 * http://rhomobile.com
 *------------------------------------------------------------------------*/
 
+#include <android/log.h>
+
 #include <sys/stat.h>
 #include <sys/resource.h>
 #include <pwd.h>
@@ -33,7 +35,7 @@
 #include "common/RhoStd.h"
 #include "common/RhoConf.h"
 #include "common/RhodesAppBase.h"
-#include "common/app_build_capabilities.h"
+// #include "common/app_build_capabilities.h"
 #include "sqlite/sqlite3.h"
 #include "logging/RhoLogConf.h"
 
@@ -205,16 +207,24 @@ static bool set_posix_environment(JNIEnv *env, jclass clsRE)
 //--------------------------------------------------------------------------------------------------
 RHO_GLOBAL void android_setup(JNIEnv *env)
 {
+    __android_log_print(ANDROID_LOG_INFO, "UGU", "android_setup 1");
+
     jclass clsRE = getJNIClass(RHODES_JAVA_CLASS_RUNTIME_EXCEPTION);
     if (!clsRE)
         return;
 
+    __android_log_print(ANDROID_LOG_INFO, "UGU", "android_setup 2");
+
     // Init logconf
     rho_logconf_Init(rho_log_path().c_str(), rho_root_path().c_str(), "");
+    __android_log_print(ANDROID_LOG_INFO, "UGU", "android_setup 3");
     if (rho_root_path().compare(rho_shared_path()) != 0)
     {
         rho_conf_Init_from_shared_path(rho_shared_path().c_str());
     }
+
+    __android_log_print(ANDROID_LOG_INFO, "UGU", "android_setup 4");
+
   if(!(RHOCONF().isExist("useAssetFS")) || RHOCONF().getBool("useAssetFS")) {
     struct rlimit rlim;
     if (getrlimit(RLIMIT_NOFILE, &rlim) == -1)
@@ -239,6 +249,8 @@ RHO_GLOBAL void android_setup(JNIEnv *env)
     }
   }
 
+    __android_log_print(ANDROID_LOG_INFO, "UGU", "android_setup 5");
+
     if (!set_posix_environment(env, clsRE)) return;
 
     if (::chdir(rho_root_path().c_str()) == -1)
@@ -247,10 +259,13 @@ RHO_GLOBAL void android_setup(JNIEnv *env)
         return;
     }
 
+    __android_log_print(ANDROID_LOG_INFO, "UGU", "android_setup 6");
+
     // Init SQLite temp directory
     sqlite3_temp_directory = (char*)s_sqlite_path.c_str();
 
    
+    __android_log_print(ANDROID_LOG_INFO, "UGU", "android_setup 7");
    
 
     // Disable log to stdout as on android all stdout redirects to /dev/null
@@ -260,6 +275,8 @@ RHO_GLOBAL void android_setup(JNIEnv *env)
     LOGCONF().setLogView(s_logSink);
 
     LOGCONF().setMemoryInfoCollector(s_memory_info_collector);
+
+    __android_log_print(ANDROID_LOG_INFO, "UGU", "android_setup 8");
 
 }
 //--------------------------------------------------------------------------------------------------

@@ -242,6 +242,7 @@ void CDBAdapter::open (String strDbPath, String strVer, boolean bTemp, boolean c
 	}
 
     boolean bExist = CRhoFile::isFileExist(strDbPath.c_str());
+    LOG(INFO) + "DB exists? " + bExist + " [" + strDbPath + "]";
     int nRes = sqlite3_open(strDbPath.c_str(),&m_dbHandle);
     if ( !checkDbError(nRes) )
         return;
@@ -262,6 +263,7 @@ void CDBAdapter::open (String strDbPath, String strVer, boolean bTemp, boolean c
     }
 
     if ( !bExist )
+        LOG(INFO) + "DB createSchema [" + strDbPath + "]";
         createSchema();
 
     sqlite3_create_function( m_dbHandle, "rhoOnDeleteObjectRecord", 3, SQLITE_ANY, 0,
@@ -1025,8 +1027,52 @@ void CDBAdapter::createSchema()
 
     if ( strSqlScript.length() == 0 )
     {
-        LOG(ERROR)+"createSchema failed. Cannot read schema file: " + strSqlScript;
-        return;
+        LOG(ERROR)+"Cannot read schema file. Continue with default schema definition.";
+        strSqlScript =
+            "CREATE TABLE client_info (\n"
+            " \"client_id\" VARCHAR(255) default NULL,\n"
+            " \"session\" VARCHAR(255) default NULL,\n"
+            " \"token\" VARCHAR(255) default NULL,\n"
+            " \"token_sent\" BIGINT default 0,\n"
+            " \"reset\" BIGINT default 0,\n"
+            " \"port\" VARCHAR(10) default NULL,\n"
+            " \"last_sync_success\" VARCHAR(100) default NULL);\n"
+            "CREATE TABLE object_values (\n"
+            " \"source_id\" BIGINT default NULL,\n"
+            " \"attrib\" varchar(255) default NULL,\n"
+            " \"object\" varchar(255) default NULL,\n"
+            " \"value\" varchar default NULL);\n"
+            "CREATE TABLE changed_values (\n"
+            " \"source_id\" BIGINT default NULL,\n"
+            " \"attrib\" varchar(255) default NULL,\n"
+            " \"object\" varchar(255) default NULL,\n"
+            " \"value\" varchar default NULL,\n"
+            " \"attrib_type\" varchar(255) default NULL,\n"
+            " \"update_type\" varchar(255) default NULL,\n"
+            " \"sent\" BIGINT default 0);\n"
+            "CREATE TABLE sources (\n"
+            " \"source_id\" BIGINT PRIMARY KEY,\n"
+            " \"name\" VARCHAR(255) default NULL,\n"
+            " \"token\" BIGINT default NULL,\n"
+            " \"sync_priority\" BIGINT,\n"
+            " \"partition\" VARCHAR(255),\n"
+            " \"sync_type\" VARCHAR(255),\n"
+            " \"metadata\" varchar default NULL, \n"
+            " \"last_updated\" BIGINT default 0,\n"
+            " \"last_inserted_size\" BIGINT default 0,\n"
+            " \"last_deleted_size\" BIGINT default 0,\n"
+            " \"last_sync_duration\" BIGINT default 0,\n"
+            " \"last_sync_success\" BIGINT default 0,\n"
+            " \"backend_refresh_time\" BIGINT default 0,\n"
+            " \"source_attribs\" varchar default NULL,\n"
+            " \"schema\" varchar default NULL,\n"
+            " \"schema_version\" varchar default NULL,\n"
+            " \"associations\" varchar default NULL,\n"
+            " \"blob_attribs\" varchar default NULL);\n"
+            "CREATE INDEX by_src_id on object_values (\"source_id\");\n"
+            "CREATE UNIQUE INDEX by_src_object ON object_values (\"object\", \"attrib\", \"source_id\");\n"
+            "CREATE INDEX by_src_value ON object_values (\"attrib\", \"source_id\", \"value\");\n"
+        ;
     }
 
 	CDBError dbError;

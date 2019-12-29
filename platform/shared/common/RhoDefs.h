@@ -153,7 +153,7 @@ typedef int LogSeverity;
 #endif
 
 #ifndef RHO_RUBY_COMPILER
-#include "common/app_build_capabilities.h"
+// #include "common/app_build_capabilities.h"
 #include "common/app_build_configs.h"
 #endif
 

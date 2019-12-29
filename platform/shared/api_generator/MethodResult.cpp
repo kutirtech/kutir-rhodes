@@ -6,7 +6,11 @@
 #include "rubyext/WebView.h"
 
 #include "MethodResultConvertor.h"
+
+#ifndef RHORC_NO_RUBY
 #include "RubyResultConvertor.h"
+#endif
+
 #include "JSONResultConvertor.h"
 #include "js_helpers.h"
 

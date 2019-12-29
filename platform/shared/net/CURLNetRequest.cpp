@@ -40,6 +40,8 @@
 #undef DEFAULT_LOGCATEGORY
 #define DEFAULT_LOGCATEGORY "Net"
 
+#define ENABLE_POST_LOG false
+
 extern "C" void rho_net_impl_network_indicator(int active);
 
 namespace rho
@@ -502,7 +504,7 @@ int CURLNetRequest::getResponseCode(CURLcode err, char const *body, size_t bodys
             statusCode = 500;
 
         RAWTRACE1("RESPONSE----- (%d bytes)", bodysize);
-        if ( !rho_conf_getBool("log_skip_post") )
+        if ( ENABLE_POST_LOG && !rho_conf_getBool("log_skip_post") )
         {
 #ifndef OS_SYMBIAN
             RAWTRACE_DATA(body, bodysize);
@@ -785,7 +787,7 @@ CURLNetRequest::CURLHolder::CURLHolder()
       ,m_lock(new common::CMutex())
       #endif
 {
-    m_bTraceCalls = rho_conf_getBool("net_trace") && !rho_conf_getBool("log_skip_post");
+    m_bTraceCalls = rho_conf_getBool("net_trace") && (ENABLE_POST_LOG && !rho_conf_getBool("log_skip_post"));
     timeout = rho_conf_getInt("net_timeout");
     if (timeout == 0)
         timeout = 30; // 30 seconds by default
@@ -833,7 +835,7 @@ void CURLNetRequest::CURLHolder::deactivate()
 CURLcode CURLNetRequest::CURLHolder::perform()
 {
     activate();
-    if ( !rho_conf_getBool("log_skip_post") )
+    if ( ENABLE_POST_LOG && !rho_conf_getBool("log_skip_post") )
         RAWTRACE3("   Activate CURLNetRequest: METHOD = [%s] URL = [%s] BODY = [%s]", mStrMethod.c_str(), mStrUrl.c_str(), mStrBody.c_str());
     else
         RAWTRACE1("   Activate CURLNetRequest: METHOD = [%s]", mStrMethod.c_str() );
@@ -853,7 +855,7 @@ CURLcode CURLNetRequest::CURLHolder::perform()
 #endif
         if (m_active <= 0) {
             RAWLOG_INFO("CURLNetRequest: request was canceled from another thread !");
-            if ( !rho_conf_getBool("log_skip_post") )
+            if ( ENABLE_POST_LOG && !rho_conf_getBool("log_skip_post") )
                 RAWLOG_INFO3("   CURLNetRequest: METHOD = [%s] URL = [%s] BODY = [%s]", mStrMethod.c_str(), mStrUrl.c_str(), mStrBody.c_str());
             else
                 RAWLOG_INFO1("   CURLNetRequest: METHOD = [%s]", mStrMethod.c_str());
@@ -915,7 +917,7 @@ CURLcode CURLNetRequest::CURLHolder::perform()
         else {
             RAWLOG_ERROR2("Operation finished with error %d: %s", (int)result, curl_easy_strerror(result));
 
-            if ( !rho_conf_getBool("log_skip_post") )
+            if ( ENABLE_POST_LOG && !rho_conf_getBool("log_skip_post") )
                 RAWLOG_ERROR3("  CURLNetRequest: METHOD = [%s] URL = [%s] BODY = [%s]", mStrMethod.c_str(), mStrUrl.c_str(), mStrBody.c_str());
             else
                 RAWLOG_ERROR1("  CURLNetRequest: METHOD = [%s]", mStrMethod.c_str());
@@ -923,7 +925,7 @@ CURLcode CURLNetRequest::CURLHolder::perform()
         break;
     }
 
-    if ( !rho_conf_getBool("log_skip_post") )
+    if ( ENABLE_POST_LOG && !rho_conf_getBool("log_skip_post") )
         RAWTRACE3("Deactivate CURLNetRequest: METHOD = [%s] URL = [%s] BODY = [%s]", mStrMethod.c_str(), mStrUrl.c_str(), mStrBody.c_str());
     else
         RAWTRACE1("Deactivate CURLNetRequest: METHOD = [%s]", mStrMethod.c_str() );

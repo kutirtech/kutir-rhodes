@@ -24,6 +24,8 @@
 * http://rhomobile.com
 *------------------------------------------------------------------------*/
 
+#include <android/log.h>
+
 #include "RhoLogConf.h"
 #include "RhoLogCat.h"
 #include "RhoLogSink.h"
@@ -31,7 +33,7 @@
 #include "common/RhoFilePath.h"
 #include "common/RhoConf.h"
 #include "common/Tokenizer.h"
-#include "common/app_build_capabilities.h"
+// #include "common/app_build_capabilities.h"
 #include "ruby/ext/rho/rhoruby.h"
 
 namespace rho{
@@ -360,7 +362,9 @@ void LogSettings::setLogFilePath(const String& logFilePath){
 
         //try to open new path first
         common::CRhoFile file;
+        __android_log_print(ANDROID_LOG_INFO, "UGU", "LogSettings::setLogFilePath 1 [%s]", logFilePath.c_str());
         if ( file.open( logFilePath.c_str(), common::CRhoFile::OpenForAppend) ) {
+            __android_log_print(ANDROID_LOG_INFO, "UGU", "LogSettings::setLogFilePath 2");
             file.close();
 
             m_strLogFilePath = logFilePath;
@@ -369,6 +373,7 @@ void LogSettings::setLogFilePath(const String& logFilePath){
                 m_pFileSink = new CLogFileSink(*this);
             }
         }        
+        __android_log_print(ANDROID_LOG_INFO, "UGU", "LogSettings::setLogFilePath 3");
     }
 }
 
@@ -558,6 +563,7 @@ using namespace rho::common;
 
 void rho_logconf_Init_with_separate_user_path(const char* szLogPath, const char* szRootPath, const char* szLogPort, const char* szUserPath)
 {
+    __android_log_print(ANDROID_LOG_INFO, "UGU", "rho_logconf_Init_with_separate_user_path 1");
 
 #ifdef RHODES_EMULATOR
     String strRootPath = szLogPath;
@@ -587,7 +593,9 @@ void rho_logconf_Init_with_separate_user_path(const char* szLogPath, const char*
 #endif
 
     LOGCONF().setLogToFile(true);
+    __android_log_print(ANDROID_LOG_INFO, "UGU", "rho_logconf_Init_with_separate_user_path 2 [%s]", logPath.c_str());
     LOGCONF().setLogFilePath( logPath.c_str() );
+    __android_log_print(ANDROID_LOG_INFO, "UGU", "rho_logconf_Init_with_separate_user_path 3");
     LOGCONF().setMaxLogFileSize(1024*50);
 
     rho_conf_Init_with_separate_user_path(szRootPath, szUserPath);

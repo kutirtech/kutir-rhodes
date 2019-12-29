@@ -71,12 +71,12 @@ public class RhoSocketImpl extends SocketImpl {
 	}
 	
 	@Override
-	public InetAddress getInetAddress() {
+	protected InetAddress getInetAddress() {
 		return remote.host;
 	}
 	
 	@Override
-	public int getPort() {
+	protected int getPort() {
 		return remote.port;
 	}
 	

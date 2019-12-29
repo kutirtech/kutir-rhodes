@@ -33,7 +33,7 @@
 #include "common/IRhoClassFactory.h"
 #include "push/RhoPushManager.h"
 #include "api_generator/MethodResult.h"
-#include "common/app_build_capabilities.h"
+// #include "common/app_build_capabilities.h"
 #include "common/app_build_configs.h"
 
 #undef DEFAULT_LOGCATEGORY
